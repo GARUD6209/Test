@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power BI & Data Analysis MCQ Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            text-align: center;
+            color: #2c5898;
+        }
+        .quiz-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .question {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .options {
+            margin-left: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+        }
+        button {
+            background-color: #2c5898;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
+        }
+        button:hover {
+            background-color: #1e3a6a;
+        }
+        .result {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            display: none;
+        }
+        .correct {
+            background-color: #e8f5e9;
+            padding: 5px;
+            border-radius: 3px;
+            color: #2e7d32;
+            display: none;
+        }
+        .incorrect {
+            background-color: #ffebee;
+            padding: 5px;
+            border-radius: 3px;
+            color: #c62828;
+            display: none;
+        }
+        .progress {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .timer {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        .pagination button {
+            margin: 0 5px;
+            padding: 5px 10px;
+        }
+        #questionNumber {
+            font-weight: bold;
+        }
+        .section-title {
+            background-color: #e1eaf5;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 30px;
+            color: #2c5898;
+        }
+        .explanation {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #2c5898;
+            display: none;
+        }
+        .quiz-selection {
+            margin-bottom: 20px;
+        }
+        select {
+            padding: 8px;
+            font-size: 16px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h1>Power BI & Data Analysis Quiz</h1>
+    
+    <div class="quiz-selection">
+        <label for="quizType">Select Quiz Topic:</label>
+        <select id="quizType" onchange="loadQuizQuestions()">
+            <option value="all">All Questions</option>
+            <option value="basics">Power BI Basics</option>
+            <option value="modeling">Data Modeling</option>
+            <option value="dax">DAX (Data Analysis Expressions)</option>
+            <option value="visualization">Data Visualization</option>
+            <option value="advanced">Advanced Features</option>
+            <option value="powerBiSpecific">Power BI Specific</option>
+            <option value="dataAnalysis">Data Analysis</option>
+            <option value="etlAndDataPreparation">ETL & Data Preparation</option>
+        </select>
+        
+        <label for="numQuestions" style="margin-left: 20px;">Number of Questions:</label>
+        <select id="numQuestions">
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+        </select>
+        
+        <button onclick="startQuiz()">Start Quiz</button>
+    </div>
+    
+    <div id="quizIntro" class="quiz-container">
+        <h2>Welcome to the Power BI & Data Analysis Quiz!</h2>
+        <p>This interactive quiz will help you prepare for your test at MPSedc. Select a topic and number of questions to begin.</p>
+        <p>Features:</p>
+        <ul>
+            <li>Topic-specific questions</li>
+            <li>Immediate feedback</li>
+            <li>Timer to practice under time constraints</li>
+            <li>Explanations for each answer</li>
+        </ul>
+        <p>Good luck with your preparation!</p>
+    </div>
+
+    <div id="quizContainer" class="quiz-container" style="display: none;">
+        <div class="timer" id="timer">Time: 00:00</div>
+        <div class="progress">
+            Question <span id="questionNumber">1</span> of <span id="totalQuestions">10</span>
+        </div>
+        
+        <div id="questionContainer"></div>
+        
+        <div class="controls">
+            <button id="prevBtn" onclick="showPreviousQuestion()" disabled>Previous</button>
+            <button id="nextBtn" onclick="showNextQuestion()">Next</button>
+        </div>
+        
+        <button id="submitBtn" style="display: none;" onclick="submitQuiz()">Submit Quiz</button>
+    </div>
+    
+    <div id="resultsContainer" class="quiz-container" style="display: none;">
+        <h2>Quiz Results</h2>
+        <div class="result" id="result"></div>
+        <div id="scoreDetails"></div>
+        <div id="questionStatus" style="display: flex; flex-wrap: wrap; justify-content: center; margin-top: 15px;"></div>
+        <button onclick="reviewQuiz()">Review Answers</button>
+        <button onclick="resetQuiz()">Take Another Quiz</button>
+    </div>
+
+    <script src="additional-questions.js"></script>
+    <script src="quiz-questions.js"></script>
+
+    <script>
+        // Create a combined array with all questions
+        let activeQuestions = [];
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let quizTimer;
+        let quizTime = 0;
+        
+        function loadQuizQuestions() {
+            const quizType = document.getElementById('quizType').value;
+            
+            // Clear the active questions array
+            activeQuestions = [];
+            
+            // Load questions based on selected category
+            if (quizType === 'all') {
+                // Include all categories of questions
+                Object.keys(quizQuestions).forEach(category => {
+                    activeQuestions = [...activeQuestions, ...quizQuestions[category]];
+                });
+            } else {
+                // Load specific category
+                activeQuestions = [...quizQuestions[quizType]];
+            }
+            
+            // Shuffle the questions
+            activeQuestions = shuffleArray(activeQuestions);
+        }
+        
+        function startQuiz() {
+            // Load and limit questions
+            loadQuizQuestions();
+            const numQuestions = parseInt(document.getElementById('numQuestions').value);
+            activeQuestions = activeQuestions.slice(0, numQuestions);
+            
+            // Reset quiz state
+            currentQuestionIndex = 0;
+            userAnswers = new Array(activeQuestions.length).fill(null);
+            quizTime = 0;
+            
+            // Update UI
+            document.getElementById('quizIntro').style.display = 'none';
+            document.getElementById('quizContainer').style.display = 'block';
+            document.getElementById('resultsContainer').style.display = 'none';
+            document.getElementById('totalQuestions').textContent = activeQuestions.length;
+            
+            // Remove review mode if it was set
+            document.getElementById('quizContainer').classList.remove('review-mode');
+            
+            // Start timer
+            clearInterval(quizTimer);
+            quizTimer = setInterval(updateTimer, 1000);
+            
+            // Display first question
+            displayQuestion();
+            
+            // Show or hide buttons
+            updateButtonStates();
+        }
+        
+        function displayQuestion() {
+            const question = activeQuestions[currentQuestionIndex];
+            const questionContainer = document.getElementById('questionContainer');
+            
+            // Update question number
+            document.getElementById('questionNumber').textContent = currentQuestionIndex + 1;
+            
+            // Create the question HTML
+            let questionHTML = `
+                <div class="question">
+                    <h3>${currentQuestionIndex + 1}. ${question.question}</h3>
+                    <div class="options">
+            `;
+            
+            // Add options
+            question.options.forEach((option, index) => {
+                const optionLetter = String.fromCharCode(97 + index); // a, b, c, d
+                const isChecked = userAnswers[currentQuestionIndex] === index ? 'checked' : '';
+                
+                questionHTML += `
+                    <label>
+                        <input type="radio" name="q${currentQuestionIndex}" value="${index}" ${isChecked} onchange="saveAnswer(${index})">
+                        ${optionLetter}) ${option}
+                    </label>
+                `;
+            });
+            
+            // Add explanation div (hidden initially)
+            questionHTML += `
+                    </div>
+                    <div class="explanation" id="explanation${currentQuestionIndex}">
+                        ${question.explanation}
+                    </div>
+                </div>
+            `;
+            
+            questionContainer.innerHTML = questionHTML;
+            
+            // Show explanation if in review mode
+            if (document.getElementById('quizContainer').classList.contains('review-mode')) {
+                const userAnswer = userAnswers[currentQuestionIndex];
+                const correctAnswer = question.answer;
+                
+                const explanationDiv = document.getElementById(`explanation${currentQuestionIndex}`);
+                explanationDiv.style.display = 'block';
+                
+                // Highlight correct and incorrect options
+                const options = document.querySelectorAll(`input[name="q${currentQuestionIndex}"]`);
+                options.forEach((option, index) => {
+                    const label = option.parentElement;
+                    option.disabled = true;
+                    
+                    if (index === correctAnswer) {
+                        label.classList.add('correct');
+                        label.style.backgroundColor = '#e8f5e9';
+                        label.style.padding = '5px';
+                        label.style.borderRadius = '3px';
+                        label.style.display = 'block';
+                    } else if (userAnswer === index) {
+                        label.classList.add('incorrect');
+                        label.style.backgroundColor = '#ffebee';
+                        label.style.padding = '5px';
+                        label.style.borderRadius = '3px';
+                        label.style.display = 'block';
+                    }
+                });
+            }
+            
+            updateButtonStates();
+        }
+        
+        function saveAnswer(answerIndex) {
+            userAnswers[currentQuestionIndex] = answerIndex;
+            updateButtonStates();
+        }
+        
+        function showNextQuestion() {
+            if (currentQuestionIndex < activeQuestions.length - 1) {
+                currentQuestionIndex++;
+                displayQuestion();
+            }
+            updateButtonStates();
+        }
+        
+        function showPreviousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                displayQuestion();
+            }
+            updateButtonStates();
+        }
+        
+        function updateButtonStates() {
+            // Prev button
+            document.getElementById('prevBtn').disabled = currentQuestionIndex === 0;
+            
+            // Next button
+            const isLastQuestion = currentQuestionIndex === activeQuestions.length - 1;
+            document.getElementById('nextBtn').style.display = isLastQuestion ? 'none' : 'block';
+            
+            // Submit button - fix the display and enabling logic
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.style.display = isLastQuestion ? 'block' : 'none';
+            
+            // Only disable submit if not in review mode AND not all questions are answered
+            const allAnswered = !userAnswers.includes(null);
+            submitBtn.disabled = !isLastQuestion || (!allAnswered && !document.getElementById('quizContainer').classList.contains('review-mode'));
+            
+            console.log("Button state updated: isLastQuestion=", isLastQuestion, "allAnswered=", allAnswered, "submitBtn.disabled=", submitBtn.disabled);
+        }
+        
+        // Also add a direct submit function that can be triggered by clicking any button
+        function forceSubmitQuiz() {
+            try {
+                console.log("Force submitting quiz...");
+                
+                // Show the results container first
+                document.getElementById('quizContainer').style.display = 'none';
+                document.getElementById('resultsContainer').style.display = 'block';
+                
+                // Then calculate and show the score
+                let correctAnswers = 0;
+                userAnswers.forEach((answer, index) => {
+                    if (answer === activeQuestions[index].answer) {
+                        correctAnswers++;
+                    }
+                });
+                
+                const score = Math.round((correctAnswers / activeQuestions.length) * 100);
+                const resultElement = document.getElementById('result');
+                resultElement.style.display = 'block';
+                
+                if (score >= 80) {
+                    resultElement.style.backgroundColor = '#e8f5e9';
+                    resultElement.style.color = '#2e7d32';
+                } else if (score >= 60) {
+                    resultElement.style.backgroundColor = '#fff9c4';
+                    resultElement.style.color = '#f57f17';
+                } else {
+                    resultElement.style.backgroundColor = '#ffebee';
+                    resultElement.style.color = '#c62828';
+                }
+                
+                resultElement.innerHTML = `Your score: ${score}%<br>${correctAnswers} out of ${activeQuestions.length} correct`;
+                
+                // Stop the timer
+                clearInterval(quizTimer);
+                
+                console.log("Quiz submitted successfully!");
+            } catch (error) {
+                console.error("Error submitting quiz:", error);
+                alert("There was an error submitting the quiz. Please try again.");
+            }
+        }
+        
+        // Modify the HTML for the Submit button to add another way to submit
+        document.addEventListener('DOMContentLoaded', function() {
+            const quizContainer = document.getElementById('quizContainer');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            // Add a second submit button at the bottom of quiz container as a fallback
+            const submitFallbackBtn = document.createElement('button');
+            submitFallbackBtn.textContent = 'Finish Quiz';
+            submitFallbackBtn.onclick = forceSubmitQuiz;
+            submitFallbackBtn.style.backgroundColor = '#c62828';
+            submitFallbackBtn.id = 'submitFallbackBtn';
+            
+            // Add this button after the original submit button
+            quizContainer.appendChild(submitFallbackBtn);
+            
+            // Update the original submit button to use the force submit function too
+            submitBtn.onclick = forceSubmitQuiz;
+        });
+        
+        function submitQuiz() {
+            clearInterval(quizTimer);
+            
+            // Calculate score
+            let correctAnswers = 0;
+            userAnswers.forEach((answer, index) => {
+                if (answer === activeQuestions[index].answer) {
+                    correctAnswers++;
+                }
+            });
+            
+            const score = Math.round((correctAnswers / activeQuestions.length) * 100);
+            const resultElement = document.getElementById('result');
+            resultElement.style.display = 'block';
+            
+            // Display score with appropriate color and message
+            if (score >= 80) {
+                resultElement.style.backgroundColor = '#e8f5e9';
+                resultElement.style.color = '#2e7d32';
+                resultElement.innerHTML = `Great job! Your score: ${score}%<br>${correctAnswers} out of ${activeQuestions.length} correct`;
+            } else if (score >= 60) {
+                resultElement.style.backgroundColor = '#fff9c4';
+                resultElement.style.color = '#f57f17';
+                resultElement.innerHTML = `Good effort! Your score: ${score}%<br>${correctAnswers} out of ${activeQuestions.length} correct`;
+            } else {
+                resultElement.style.backgroundColor = '#ffebee';
+                resultElement.style.color = '#c62828';
+                resultElement.innerHTML = `Keep practicing! Your score: ${score}%<br>${correctAnswers} out of ${activeQuestions.length} correct`;
+            }
+            
+            // Create question status dots
+            const questionStatus = document.getElementById('questionStatus');
+            questionStatus.innerHTML = ''; // Clear existing content
+            
+            // Add style for the question dots if they don't exist
+            document.head.insertAdjacentHTML('beforeend', `
+                <style>
+                    .question-dot {
+                        width: 30px;
+                        height: 30px;
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin: 5px;
+                        cursor: pointer;
+                        font-weight: bold;
+                    }
+                    .correct-answer {
+                        background-color: #e8f5e9;
+                        color: #2e7d32;
+                        border: 1px solid #2e7d32;
+                    }
+                    .incorrect-answer {
+                        background-color: #ffebee;
+                        color: #c62828;
+                        border: 1px solid #c62828;
+                    }
+                    .not-answered {
+                        background-color: #f5f5f5;
+                        color: #757575;
+                        border: 1px solid #757575;
+                    }
+                </style>
+            `);
+            
+            userAnswers.forEach((answer, index) => {
+                const isCorrect = answer === activeQuestions[index].answer;
+                const statusClass = answer === null ? 'not-answered' : (isCorrect ? 'correct-answer' : 'incorrect-answer');
+                const dotElement = document.createElement('div');
+                dotElement.className = `question-dot ${statusClass}`;
+                dotElement.textContent = index + 1;
+                dotElement.onclick = function() {
+                    reviewSpecificQuestion(index);
+                };
+                questionStatus.appendChild(dotElement);
+            });
+            
+            // Display completion time
+            const hours = Math.floor(quizTime / 3600);
+            const minutes = Math.floor((quizTime % 3600) / 60);
+            const seconds = quizTime % 60;
+            const timeString = `${hours > 0 ? hours + ' hr ' : ''}${minutes > 0 ? minutes + ' min ' : ''}${seconds} sec`;
+            
+            const scoreDetailsElement = document.getElementById('scoreDetails');
+            scoreDetailsElement.innerHTML = `
+                <div class="review-summary">
+                    <p>Completion Time: ${timeString}</p>
+                    <p>Click on a question number below to review that question:</p>
+                </div>
+            `;
+            
+            // Show results container
+            document.getElementById('quizContainer').style.display = 'none';
+            document.getElementById('resultsContainer').style.display = 'block';
+        }
+        
+        function reviewQuiz() {
+            // Set review mode
+            document.getElementById('quizContainer').classList.add('review-mode');
+            
+            // Reset to first question
+            currentQuestionIndex = 0;
+            
+            // Update UI
+            document.getElementById('resultsContainer').style.display = 'none';
+            document.getElementById('quizContainer').style.display = 'block';
+            document.getElementById('timer').style.display = 'none';
+            
+            // Display first question in review mode
+            displayQuestion();
+            
+            // Update navigation buttons
+            updateButtonStates();
+        }
+        
+        function reviewSpecificQuestion(index) {
+            // Set review mode
+            document.getElementById('quizContainer').classList.add('review-mode');
+            
+            // Set question index
+            currentQuestionIndex = index;
+            
+            // Update UI
+            document.getElementById('resultsContainer').style.display = 'none';
+            document.getElementById('quizContainer').style.display = 'block';
+            document.getElementById('timer').style.display = 'none';
+            
+            // Display the specific question in review mode
+            displayQuestion();
+            
+            // Update navigation buttons
+            updateButtonStates();
+        }
+        
+        function resetQuiz() {
+            // Reset quiz state
+            currentQuestionIndex = 0;
+            userAnswers = [];
+            quizTime = 0;
+            
+            // Update UI
+            document.getElementById('resultsContainer').style.display = 'none';
+            document.getElementById('quizContainer').style.display = 'none';
+            document.getElementById('quizIntro').style.display = 'block';
+            document.getElementById('timer').style.display = 'block';
+            document.getElementById('timer').textContent = 'Time: 00:00';
+            
+            // Remove review mode if it was set
+            document.getElementById('quizContainer').classList.remove('review-mode');
+        }
+        
+        function updateTimer() {
+            quizTime++;
+            const hours = Math.floor(quizTime / 3600);
+            const minutes = Math.floor((quizTime % 3600) / 60);
+            const seconds = quizTime % 60;
+            
+            const formattedHours = hours.toString().padStart(2, '0');
+            const formattedMinutes = minutes.toString().padStart(2, '0');
+            const formattedSeconds = seconds.toString().padStart(2, '0');
+            
+            let timeString = '';
+            if (hours > 0) {
+                timeString = `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+            } else {
+                timeString = `${formattedMinutes}:${formattedSeconds}`;
+            }
+            
+            document.getElementById('timer').textContent = `Time: ${timeString}`;
+        }
+        
+        // Fisher-Yates shuffle algorithm
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+        
+        // Initialize quiz on page load
+        loadQuizQuestions();
+    </script>
+</body>
+</html>
